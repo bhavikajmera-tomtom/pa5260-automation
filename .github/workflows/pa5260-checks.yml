@@ -1,0 +1,33 @@
+name: PA-5260 Checks
+
+on:
+  workflow_dispatch:
+    inputs:
+      script:
+        description: "Script to run"
+        required: true
+        default: "pa5260_status.py"
+        type: choice
+        options:
+          - pa5260_status.py
+          - get_firewall_info.py
+          - get_security_rules.py
+          - get_interfaces.py
+          - get_ha_status.py
+          - get_active_sessions.py
+          - get_routing_table.py
+
+jobs:
+  run-check:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run ${{ inputs.script }}
+        env:
+          PANOS_HOSTNAME: ${{ secrets.PANOS_HOSTNAME }}
+          PANOS_API_KEY: ${{ secrets.PANOS_API_KEY }}
+        run: python ${{ inputs.script }}
